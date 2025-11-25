@@ -1,25 +1,43 @@
 <?php
 
-header('Content-Type: application/json');
-
 $dischi = file_get_contents('dischi.json');
-$dischi_array = json_decode($dischi, true);
 
-// prendo post con json
-$raw = file_get_contents("php://input");
+if(isset($_POST['payload'])){
+    
+	$newData = $_POST["payload"];
 
-if (!empty($raw)) {
+    $dischi_array = json_decode($dischi, true);
 
-    $data = json_decode($raw, true);
+    $dischi_array[] = $newData;
 
-    if (isset($data['payload'])) {
+    $new_dischi = json_encode($dischi_array);
 
-        $newData = $data['payload'];
+    file_put_contents('dischi.json', $new_dischi);
 
-        $dischi_array[] = $newData;
+    $dischi = $new_dischi;
 
-        file_put_contents('dischi.json', json_encode($dischi_array, JSON_PRETTY_PRINT));
+}elseif(isset($_POST['id_elimina'])){
+
+    $id = $_POST['id_elimina'];
+
+    $dischi_array = json_decode($dischi, true);
+
+    foreach($dischi_array as $index => $disco){
+        if($disco['id'] == $id){
+            unset($dischi_array[$index]);
+            break;
+        }
     }
+
+    $new_dischi = json_encode(array_values($dischi_array));
+
+    file_put_contents('dischi.json', $new_dischi);
+
+    $dischi = $new_dischi;
+
 }
 
-echo json_encode($dischi_array);
+header('Content-Type: application/json');
+
+
+echo $dischi;

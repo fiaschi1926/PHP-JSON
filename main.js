@@ -1,4 +1,3 @@
-
 const url = "http://localhost:8000/api.php";
 const container = document.querySelector('#container');
 
@@ -13,35 +12,19 @@ axios.get(url)
 
             dischi = result.data;
 
-            console.log(dischi);
-
             dischi.forEach((s) => {
 
                 const div = document.createElement('div');
                 div.classList.add('card');
-
                 container.appendChild(div);
 
                 div.style = 'border-style: solid';
 
-                const img = document.createElement('img');
-                const h1 = document.createElement('h1');
-                const h2 = document.createElement('h2');
-                const p = document.createElement('p');
+                let html = `<img src="${s.poster}"><h1>${s.title}</h1><h2>author: ${s.author}</h2><p>year: ${s.year} - genre: ${s.genre}</p><button id="elimina-${s.id}">elimina disco</button>`;
 
-                img.src = s.poster;
-
-                h1.innerText = `${s.title}`;
-                h2.innerText = `author: ${s.author}`;
-                p.innerText = `year: ${s.year} - genre: ${s.genre}`;
-
-                div.appendChild(img);
-                div.appendChild(h1);
-                div.appendChild(h2);
-                div.appendChild(p);
+                div.innerHTML = html;
 
             });
-
         })
     .catch(
         (error) => {
@@ -53,31 +36,55 @@ axios.get(url)
         });
 
 
-
 document.getElementById('add').addEventListener('click', function () {
+
+    let maxId = 0;
+    dischi.forEach((d) => {
+        if (d.id > maxId) {
+            maxId = d.id;
+        }
+    });
 
     const newDisco = {
         "poster": "https:\/\/upload.wikimedia.org\/wikipedia\/en\/0\/03\/Iron_Maiden_-_Brave_New_World.jpg",
         "title": "New Jersey",
         "author": "Bon Jovi",
         "genre": "Rock",
-        "year": "1988"
+        "year": "1988",
+        "id": parseInt(maxId) + 1
     };
 
     const requestData = { payload: newDisco };
     const requestConfig = {
         headers: {
-            // "Content-Type": "multipart/form-data"
-            "Content-Type": "application/json"
+            "Content-Type": "multipart/form-data"
         }
     };
 
     axios.post(url, requestData, requestConfig).then(response => {
-
-        console.log(response.data);
         window.location.href = "index.html"
+
+    });
+});
+
+container.addEventListener('click', function (event) {
+
+    if (!event.target.id.startsWith('elimina-')) {
+        return;
+    }
+
+    let idDisco = event.target.id.replace('elimina-', '');
+
+    const requestData = { id_elimina: idDisco };
+    const requestConfig = {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    };
+
+     axios.post(url, requestData, requestConfig).then(response => {
+        window.location.href = "index.html"
+
     });
 
 });
-
-
