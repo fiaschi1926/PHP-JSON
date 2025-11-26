@@ -68,3 +68,11 @@ body {
     height: 100px;
     border-radius: 50%;
 }
+
+.ascoltato{
+    background-color: rgb(163, 255, 163);
+}
+
+.mt-1{
+    margin-top: 1rem;
+}
